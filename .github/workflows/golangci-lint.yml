@@ -18,22 +18,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: checkout
+name: golangci-lint
 
 on:
   workflow_call:
     inputs:
       os:
+        description: ""
         required: false
         default: ubuntu-latest
         type: string
       depth:
+        description: ""
         required: false
-        default: 0
+        default: 1
         type: number
+      version:
+        description: ""
+        required: true
+        type: string
+      go-version:
+        description: ""
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
-  triage:
+  lint:
     runs-on: ${{ inputs.os }}
     steps:
       - name: Windows Line Endings
@@ -46,3 +60,15 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: ${{ inputs.depth }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19.5"
+          cache: true
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: ${{ inputs.version }}
+          only-new-issues: true
