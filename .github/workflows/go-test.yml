@@ -81,6 +81,9 @@ jobs:
       - name: Install tfparse
         run: go install github.com/mfridman/tparse@latest
 
+      - name: Create Reports Directory
+        run: mkdir -p reports
+
       - name: Run Unit Tests
         run: task unit-test | tee reports/unittest.json | tparse -follow
         env:
