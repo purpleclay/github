@@ -1,0 +1,99 @@
+# Copyright (c) 2023 Purple Clay
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# in the Software without restriction, including without limitation the rights
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: go-test
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: "The operating system used by the virtual environment for the job. Defaults to ubuntu-latest"
+        required: false
+        default: ubuntu-latest
+        type: string
+      depth:
+        description: "The depth of the git clone. Defaults to a shallow clone"
+        required: false
+        default: 1
+        type: number
+      go-version:
+        description: "The version of go to install and configure for the job"
+        required: true
+        type: string
+    secrets:
+      github-token:
+        description: "The reserved GitHub APP installation token known as GITHUB_TOKEN"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  go-test:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Windows Line Endings
+        if: ${{ inputs.os == 'windows-latest' }}
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Git Clone
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.depth }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.github-token }}
+
+      - name: Download Go Dependencies
+        run: task deps
+
+      # TODO: conditionally run task build if task definition exists
+
+      - name: Install tfparse
+        run: go install github.com/mfridman/tparse@latest
+
+      - name: Create Reports Directory
+        run: mkdir -p reports
+
+      - name: Run Unit Tests
+        run: task unit-test | tee reports/unittest.json | tparse -follow
+        env:
+          TEST_FORMAT: "-json"
+          COVER_PROFILE: "reports/unittest-cover.txt"
+
+      - name: Upload Reports
+        if: ${{ inputs.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: reports/**
+          retention-days: 1
