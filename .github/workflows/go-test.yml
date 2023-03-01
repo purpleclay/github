@@ -46,7 +46,7 @@ permissions:
   contents: read
 
 jobs:
-  golangci-lint:
+  go-test:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ${{ inputs.os }}
     steps:
@@ -91,9 +91,9 @@ jobs:
           COVER_PROFILE: "reports/unittest-cover.txt"
 
       - name: Upload Reports
+        if: ${{ inputs.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
         with:
           name: reports
           path: reports/**
-
-      # test (write job summary)
+          retention-days: 1
