@@ -39,7 +39,7 @@ on:
         type: string
     secrets:
       github-token:
-        description: ""
+        description: "The reserved GitHub APP installation token known as GITHUB_TOKEN"
         required: true
 
 permissions:
