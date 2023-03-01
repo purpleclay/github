@@ -24,21 +24,21 @@ on:
   workflow_call:
     inputs:
       os:
-        description: ""
+        description: "The operating system used by the virtual environment for the job. Defaults to ubuntu-latest"
         required: false
         default: ubuntu-latest
         type: string
       depth:
-        description: ""
+        description: "The depth of the git clone. Defaults to a shallow clone"
         required: false
         default: 1
         type: number
       version:
-        description: ""
+        description: "The version of golangci-lint to download and use"
         required: true
         type: string
       go-version:
-        description: ""
+        description: "The version of go to install and configure for the job"
         required: true
         type: string
 
