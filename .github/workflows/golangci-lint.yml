@@ -1,0 +1,75 @@
+# Copyright (c) 2023 Purple Clay
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# in the Software without restriction, including without limitation the rights
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: golangci-lint
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: "The operating system used by the virtual environment for the job. Defaults to ubuntu-latest"
+        required: false
+        default: ubuntu-latest
+        type: string
+      depth:
+        description: "The depth of the git clone. Defaults to a shallow clone"
+        required: false
+        default: 1
+        type: number
+      version:
+        description: "The version of golangci-lint to download and use"
+        required: true
+        type: string
+      go-version:
+        description: "The version of go to install and configure for the job"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  golangci-lint:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Windows Line Endings
+        if: ${{ inputs.os == 'windows-latest' }}
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Git Clone
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.depth }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: ${{ inputs.version }}
+          only-new-issues: true
