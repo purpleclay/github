@@ -47,7 +47,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  lint:
+  golangci-lint:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ${{ inputs.os }}
     steps:
       - name: Windows Line Endings
