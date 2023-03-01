@@ -37,6 +37,10 @@ on:
         description: "The version of go to install and configure for the job"
         required: true
         type: string
+    secrets:
+      github-token:
+        description: ""
+        required: true
 
 permissions:
   contents: read
@@ -66,7 +70,8 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+          repo-token: ${{ secrets.github-token }}
 
       - name: Download Go Dependencies
         run: task deps
