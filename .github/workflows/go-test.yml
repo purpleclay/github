@@ -90,6 +90,9 @@ jobs:
           TEST_FORMAT: "-json"
           COVER_PROFILE: "reports/unittest-cover.txt"
 
+      - name: Publish Job Summary
+        run: NO_COLOR=1 tparse -format markdown -slow 10 -file reports/unittest.json > $GITHUB_STEP_SUMMARY
+
       - name: Upload Reports
         if: ${{ inputs.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
