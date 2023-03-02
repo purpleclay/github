@@ -90,14 +90,8 @@ jobs:
           TEST_FORMAT: "-json"
           COVER_PROFILE: "reports/unittest-cover.txt"
 
-      # Ensure a full summary is generated only on the ubuntu-latest environment
-      - name:
-        if: ${{ inputs.os == 'ubuntu-latest' }}
-        run: |
-          echo "TPARSE_FLAGS=-all" >> $GITHUB_ENV
-
       - name: Publish Job Summary
-        run: tparse -format markdown -file reports/unittest.json ${{env.TPARSE_FLAGS}} > $GITHUB_STEP_SUMMARY
+        run: tparse -format markdown -file reports/unittest.json -all > $GITHUB_STEP_SUMMARY
         env:
           NO_COLOR: 1
 
