@@ -68,8 +68,21 @@ jobs:
           go-version: ${{ inputs.go-version }}
           cache: true
 
-      - name: Lint
-        uses: golangci/golangci-lint-action@v3
+      - name: Create Reports Directory
+        run: mkdir -p reports
+
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@${{ inputs.version }}
+
+      - name: Lint Code
+        run: task lint | tee reports/golangci-lint.xml
+        env:
+          REPORT_FORMAT: checkstyle
+
+      - name: Upload Reports
+        if: ${{ inputs.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v3
         with:
-          version: ${{ inputs.version }}
-          only-new-issues: true
+          name: reports
+          path: reports/**
+          retention-days: 1
