@@ -66,7 +66,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: reports
-          path: reports/**
 
       # A quirk of the download-artifact action is that files will end up in a sub-directory
       # within /home/runner/work. The SonarCloud job will look within /github/workspace
@@ -74,6 +73,7 @@ jobs:
       - name: Copy Reports
         run: |
           echo $GITHUB_WORKSPACE
+          ls -l ${{steps.download.outputs.download-path}}
           mv ${{steps.download.outputs.download-path}}/reports /github/workspace
 
       - name: SonarCloud Analysis
