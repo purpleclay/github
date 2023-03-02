@@ -66,14 +66,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: reports
+          # Ensure reports are copied into the expected location
           path: reports
-
-      # A quirk of the download-artifact action is that files will end up in a sub-directory
-      # within /home/runner/work. The SonarCloud job will look within /github/workspace
-      # by default, so a copy is needed
-      - name: Copy Reports
-        run: |
-          ls -l ${{steps.download.outputs.download-path}}
 
       - name: SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@master
