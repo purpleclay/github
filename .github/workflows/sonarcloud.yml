@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: golangci-lint
+name: sonar-cloud
 
 on:
   workflow_call:
@@ -45,7 +45,7 @@ permissions:
   contents: read
 
 jobs:
-  sonarcloud:
+  sonar-cloud:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ${{ inputs.os }}
     steps:
@@ -59,6 +59,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: ${{ inputs.depth }}
+
+      - name: Download Reports
+        if: ${{ inputs.os == 'ubuntu-latest' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: reports
+          path: reports/**
 
       - name: SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@master
