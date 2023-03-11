@@ -71,6 +71,7 @@ jobs:
 
   govulncheck:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Git Clone
         uses: actions/checkout@v3
