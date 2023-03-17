@@ -69,6 +69,19 @@ jobs:
           # Ensure reports are copied into the expected location
           path: reports
 
+      - run: cp sonar-project.properties sonar-project2.properties
+
+      - name: Patch Sonar Properties
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'sonar.projectVersion='
+          replace: 'sonar.projectVersion=${{ github.ref_name }}'
+          regex: false
+          include: sonar-project2.properties
+
+      - run: cat sonar-project2.properties
+
       - name: SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@master
         env:
