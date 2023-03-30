@@ -22,6 +22,12 @@ name: deepsource-coverage
 
 on:
   workflow_call:
+    inputs:
+      depth:
+        description: "The depth of the git clone. Defaults to a full clone"
+        required: false
+        default: 0
+        type: number
     secrets:
       deepsource-dsn:
         description: "A secret containing the DeepSource Data Source Name for uploading coverage reports"
@@ -32,6 +38,11 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Git Clone
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.depth }}
+
       - name: Download Reports
         id: download
         uses: actions/download-artifact@v3
