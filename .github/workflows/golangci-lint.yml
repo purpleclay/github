@@ -73,21 +73,8 @@ jobs:
           version: 3.x
           repo-token: ${{ secrets.github-token }}
 
-      - name: Create Reports Directory
-        run: mkdir -p reports
-
       - name: Install golangci-lint
         run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@${{ inputs.version }}
 
       - name: Lint Code
-        run: task lint | tee reports/golangci-lint.xml
-        env:
-          REPORT_FORMAT: checkstyle
-
-      - name: Upload Reports
-        if: ${{ inputs.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: reports
-          path: reports/**
-          retention-days: 1
+        run: task lint
