@@ -94,11 +94,3 @@ jobs:
         run: tparse -format markdown -file reports/unittest.json -all > $GITHUB_STEP_SUMMARY
         env:
           NO_COLOR: 1
-
-      - name: Upload Reports
-        if: ${{ inputs.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: reports/**
-          retention-days: 1
