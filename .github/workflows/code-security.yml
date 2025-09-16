@@ -54,7 +54,7 @@ jobs:
 
       - name: Grype Scan
         id: grype
-        uses: anchore/scan-action@v6
+        uses: anchore/scan-action@v7
         with:
           path: "."
           severity-cutoff: medium
